@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jogo do Casal 🐱</title>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --pink: #ff7eb3;
+    --pink-light: #ffd6e8;
+    --pink-pale: #fff0f7;
+    --red: #e8365d;
+    --cream: #fff8f0;
+    --brown: #7a4f3a;
+    --text: #3a2535;
+    --shadow: rgba(232, 54, 93, 0.2);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--cream);
+    min-height: 100vh;
+    overflow-x: hidden;
+    color: var(--text);
+  }
+
+  /* Fundo com padrão de patinhas */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cg opacity='0.07' fill='%23e8365d'%3E%3Cellipse cx='28' cy='32' rx='5' ry='6'/%3E%3Cellipse cx='40' cy='28' rx='5' ry='6'/%3E%3Cellipse cx='52' cy='32' rx='5' ry='6'/%3E%3Cellipse cx='40' cy='48' rx='10' ry='12'/%3E%3C/g%3E%3C/svg%3E");
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 20px 16px 60px;
+  }
+
+  /* Header */
+  header {
+    text-align: center;
+    padding: 24px 0 16px;
+    position: relative;
+  }
+
+  .cat-header {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+
+  .cat-emoji { font-size: 2.5rem; animation: bounce 2s infinite; }
+  .cat-emoji:nth-child(2) { animation-delay: 0.3s; }
+  .cat-emoji:nth-child(3) { animation-delay: 0.6s; }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+
+  h1 {
+    font-family: 'Pacifico', cursive;
+    font-size: 2.2rem;
+    background: linear-gradient(135deg, var(--red), var(--pink));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1.2;
+    margin-bottom: 6px;
+  }
+
+  .subtitle {
+    font-size: 0.95rem;
+    color: var(--pink);
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+
+  .hearts-divider {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin: 12px 0;
+    font-size: 1rem;
+  }
+
+  /* Card principal */
+  .card {
+    background: white;
+    border-radius: 24px;
+    padding: 24px;
+    box-shadow: 0 8px 32px var(--shadow);
+    margin-bottom: 20px;
+    border: 2px solid var(--pink-light);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: -30px; right: -30px;
+    width: 100px; height: 100px;
+    background: var(--pink-light);
+    border-radius: 50%;
+    opacity: 0.5;
+  }
+
+  /* Info do casal */
+  .couple-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .player {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+    min-width: 100px;
+  }
+
+  .player-avatar {
+    width: 70px; height: 70px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2rem;
+    border: 3px solid var(--pink);
+    box-shadow: 0 4px 12px var(--shadow);
+  }
+
+  .player-avatar.alice { background: linear-gradient(135deg, #ffb6d9, #ff7eb3); }
+  .player-avatar.joao { background: linear-gradient(135deg, #b6d9ff, #7eb3ff); }
+
+  .player-name {
+    font-weight: 800;
+    font-size: 1rem;
+    color: var(--text);
+  }
+
+  .heart-middle {
+    font-size: 2rem;
+    animation: pulse 1.5s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+  }
+
+  .date-badge {
+    text-align: center;
+    margin-top: 14px;
+    background: var(--pink-pale);
+    border-radius: 50px;
+    padding: 8px 20px;
+    display: inline-block;
+    width: 100%;
+  }
+
+  .date-badge span {
+    font-weight: 700;
+    color: var(--red);
+    font-size: 0.9rem;
+  }
+
+  /* Contador */
+  .counter-card {
+    background: linear-gradient(135deg, var(--red), var(--pink));
+    color: white;
+    border-radius: 20px;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 20px;
+    box-shadow: 0 6px 24px var(--shadow);
+  }
+
+  .counter-label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    opacity: 0.9;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .counter-days {
+    font-family: 'Pacifico', cursive;
+    font-size: 3rem;
+    line-height: 1;
+  }
+
+  .counter-sub { font-size: 0.9rem; opacity: 0.85; margin-top: 4px; }
+
+  /* Abas */
+  .tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+
+  .tab-btn {
+    flex: 1;
+    min-width: 110px;
+    padding: 10px 14px;
+    border: 2px solid var(--pink-light);
+    background: white;
+    border-radius: 50px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: all 0.25s;
+    color: var(--text);
+    white-space: nowrap;
+    text-align: center;
+  }
+
+  .tab-btn.active {
+    background: linear-gradient(135deg, var(--red), var(--pink));
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 12px var(--shadow);
+  }
+
+  .tab-btn:hover:not(.active) {
+    border-color: var(--pink);
+    background: var(--pink-pale);
+  }
+
+  /* Painel do sorteio */
+  .game-panel {
+    display: none;
+  }
+
+  .game-panel.active { display: block; }
+
+  /* Grade de números */
+  .numbers-section h3 {
+    font-size: 1rem;
+    color: var(--brown);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .numbers-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .num-cell {
+    aspect-ratio: 1;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 1.05rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 2px solid var(--pink-light);
+    background: white;
+    color: var(--text);
+    position: relative;
+  }
+
+  .num-cell:hover:not(.drawn) {
+    transform: scale(1.08);
+    border-color: var(--pink);
+    box-shadow: 0 4px 12px var(--shadow);
+  }
+
+  .num-cell.drawn {
+    background: linear-gradient(135deg, var(--red), var(--pink));
+    color: white;
+    border-color: transparent;
+    cursor: default;
+    box-shadow: 0 4px 12px var(--shadow);
+  }
+
+  .num-cell.drawn::after {
+    content: '✓';
+    position: absolute;
+    bottom: 3px;
+    right: 5px;
+    font-size: 0.55rem;
+    opacity: 0.8;
+  }
+
+  /* Botão sorteio */
+  .draw-btn {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, var(--red), var(--pink));
+    color: white;
+    border: none;
+    border-radius: 18px;
+    font-family: 'Pacifico', cursive;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.25s;
+    box-shadow: 0 6px 20px var(--shadow);
+    margin-bottom: 16px;
+    letter-spacing: 0.5px;
+  }
+
+  .draw-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 28px var(--shadow); }
+  .draw-btn:active { transform: translateY(0); }
+
+  .draw-btn:disabled {
+    background: #ddd;
+    box-shadow: none;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* Resultado do sorteio */
+  .result-box {
+    display: none;
+    background: linear-gradient(135deg, #fff0f7, #ffe4f0);
+    border: 2px solid var(--pink);
+    border-radius: 20px;
+    padding: 20px;
+    text-align: center;
+    animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .result-box.show { display: block; }
+
+  @keyframes popIn {
+    0% { transform: scale(0.7); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  .result-num {
+    font-family: 'Pacifico', cursive;
+    font-size: 3.5rem;
+    background: linear-gradient(135deg, var(--red), var(--pink));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .result-type {
+    display: inline-block;
+    padding: 4px 16px;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .result-type.pergunta { background: #ffe0cc; color: #b35200; }
+  .result-type.desafio { background: #d4f0ff; color: #00548b; }
+  .result-type.especial { background: #e8d4ff; color: #5b0099; }
+
+  .result-text {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.4;
+  }
+
+  .result-cat {
+    font-size: 2.5rem;
+    margin-top: 8px;
+  }
+
+  /* Roleta visual */
+  .spin-indicator {
+    display: none;
+    text-align: center;
+    padding: 24px;
+    font-size: 2.5rem;
+    animation: spin 0.4s linear infinite;
+  }
+
+  .spin-indicator.show { display: block; }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  /* Reset */
+  .reset-btn {
+    width: 100%;
+    padding: 12px;
+    background: white;
+    border: 2px solid var(--pink-light);
+    border-radius: 14px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    color: var(--brown);
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+    margin-top: 10px;
+  }
+
+  .reset-btn:hover { border-color: var(--pink); background: var(--pink-pale); }
+
+  /* Perguntas list */
+  .questions-list { max-height: 60vh; overflow-y: auto; padding-right: 4px; }
+  .questions-list::-webkit-scrollbar { width: 4px; }
+  .questions-list::-webkit-scrollbar-track { background: var(--pink-pale); border-radius: 4px; }
+  .questions-list::-webkit-scrollbar-thumb { background: var(--pink); border-radius: 4px; }
+
+  .q-item {
+    display: flex;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    margin-bottom: 8px;
+    align-items: flex-start;
+    transition: background 0.2s;
+  }
+
+  .q-item:hover { background: var(--pink-pale); }
+
+  .q-num {
+    min-width: 28px; height: 28px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 800;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .q-num.p { background: #ffe0cc; color: #b35200; }
+  .q-num.d { background: #d4f0ff; color: #00548b; }
+  .q-num.e { background: #e8d4ff; color: #5b0099; }
+
+  .q-text { font-size: 0.9rem; line-height: 1.4; font-weight: 600; color: var(--text); }
+
+  .legend {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    font-weight: 700;
+  }
+
+  .leg-dot {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+  }
+
+  .leg-dot.p { background: #ffe0cc; border: 2px solid #b35200; }
+  .leg-dot.d { background: #d4f0ff; border: 2px solid #00548b; }
+  .leg-dot.e { background: #e8d4ff; border: 2px solid #5b0099; }
+
+  /* Responsive */
+  @media (max-width: 400px) {
+    h1 { font-size: 1.8rem; }
+    .numbers-grid { grid-template-columns: repeat(5, 1fr); gap: 6px; }
+    .num-cell { font-size: 0.9rem; }
+  }
+
+  /* Confetes */
+  .confetti-wrap {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 999;
+    overflow: hidden;
+  }
+
+  .confetti-piece {
+    position: absolute;
+    width: 10px; height: 10px;
+    top: -10px;
+    animation: fall linear forwards;
+    border-radius: 50%;
+  }
+
+  @keyframes fall {
+    to { transform: translateY(105vh) rotate(720deg); opacity: 0; }
+  }
+
+  .cat-decoration {
+    position: absolute;
+    font-size: 1.5rem;
+    opacity: 0.12;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+
+<div id="confetti-wrap" class="confetti-wrap"></div>
+
+<div class="wrapper">
+
+  <!-- Header -->
+  <header>
+    <div class="cat-header">
+      <span class="cat-emoji">🐱</span>
+      <span class="cat-emoji">💕</span>
+      <span class="cat-emoji">🐱</span>
+    </div>
+    <h1>Jogo do Casal</h1>
+    <p class="subtitle">🐾 Alícia Maria & João Pedro 🐾</p>
+    <div class="hearts-divider">
+      <span>💗</span><span>🐾</span><span>💗</span><span>🐾</span><span>💗</span>
+    </div>
+  </header>
+
+  <!-- Contador -->
+  <div class="counter-card">
+    <div class="counter-label">🐱 Juntos há</div>
+    <div class="counter-days" id="days-count">0</div>
+    <div class="counter-sub">dias de muito amor e fofura 💕</div>
+  </div>
+
+  <!-- Info do casal -->
+  <div class="card">
+    <div class="couple-info">
+      <div class="player">
+        <div class="player-avatar alice">🐱</div>
+        <span class="player-name">Alícia Maria</span>
+      </div>
+      <div class="heart-middle">💕</div>
+      <div class="player">
+        <div class="player-avatar joao">🐈</div>
+        <span class="player-name">João Pedro</span>
+      </div>
+    </div>
+    <div class="date-badge">
+      <span>🗓️ Desde 25 de Abril de 2025</span>
+    </div>
+  </div>
+
+  <!-- Abas -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('sorteio')">🎲 Sorteio</button>
+    <button class="tab-btn" onclick="switchTab('perguntas')">❓ Perguntas</button>
+    <button class="tab-btn" onclick="switchTab('desafios')">🎯 Desafios</button>
+    <button class="tab-btn" onclick="switchTab('quiz')">🏆 Quiz Nós</button>
+  </div>
+
+  <!-- PAINEL SORTEIO -->
+  <div id="tab-sorteio" class="game-panel active">
+    <div class="card">
+      <div class="numbers-section">
+        <h3>🐾 Escolha ou sorteie um número (1–25):</h3>
+
+        <div class="legend">
+          <div class="legend-item"><div class="leg-dot p"></div> Pergunta</div>
+          <div class="legend-item"><div class="leg-dot d"></div> Desafio</div>
+          <div class="legend-item"><div class="leg-dot e"></div> Especial</div>
+        </div>
+
+        <div class="numbers-grid" id="numbers-grid"></div>
+      </div>
+
+      <button class="draw-btn" id="draw-btn" onclick="drawNumber()">
+        🐱 Sortear Número!
+      </button>
+
+      <div class="spin-indicator" id="spinner">🎲</div>
+
+      <div class="result-box" id="result-box">
+        <div class="result-num" id="result-num"></div>
+        <div class="result-type" id="result-type"></div>
+        <div class="result-text" id="result-text"></div>
+        <div class="result-cat" id="result-cat"></div>
+      </div>
+
+      <button class="reset-btn" onclick="resetGame()">🔄 Reiniciar Jogo</button>
+    </div>
+  </div>
+
+  <!-- PAINEL PERGUNTAS -->
+  <div id="tab-perguntas" class="game-panel">
+    <div class="card">
+      <h3 style="font-size:1rem; color:var(--brown); margin-bottom:14px;">❓ Perguntas para responder juntos:</h3>
+      <div class="questions-list" id="perguntas-list"></div>
+    </div>
+  </div>
+
+  <!-- PAINEL DESAFIOS -->
+  <div id="tab-desafios" class="game-panel">
+    <div class="card">
+      <h3 style="font-size:1rem; color:var(--brown); margin-bottom:14px;">🎯 Desafios fofinhos:</h3>
+      <div class="questions-list" id="desafios-list"></div>
+    </div>
+  </div>
+
+  <!-- PAINEL QUIZ NÓS -->
+  <div id="tab-quiz" class="game-panel">
+    <div class="card">
+      <h3 style="font-size:1rem; color:var(--brown); margin-bottom:14px;">🏆 Quiz "Quem é mais...?"</h3>
+      <div class="questions-list" id="quiz-list"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // === DADOS DO JOGO ===
+  const startDate = new Date('2025-04-25');
+
+  function calcDays() {
+    const now = new Date();
+    const diff = Math.floor((now - startDate) / (1000 * 60 * 60 * 24));
+    document.getElementById('days-count').textContent = diff;
+  }
+  calcDays();
+
+  // Tipos: 'p' = pergunta, 'd' = desafio, 'e' = especial
+  const cards = {
+    1:  { type: 'p', text: 'Qual é a sua memória favorita do nosso relacionamento até agora? 💭', cat: '😻' },
+    2:  { type: 'd', text: 'Dê 5 beijos pelo rosto do outro sem parar! 💋', cat: '😽' },
+    3:  { type: 'p', text: 'Quem se apaixonou primeiro: Alícia ou João Pedro? 💕', cat: '🐱' },
+    4:  { type: 'd', text: 'Olhem nos olhos um do outro por 30 segundos sem rir! 👀', cat: '🙀' },
+    5:  { type: 'p', text: 'O que mais te atrai na personalidade do(a) parceiro(a)?', cat: '😻' },
+    6:  { type: 'd', text: 'Mande uma mensagem fofa pro outro agora mesmo! 📱', cat: '😽' },
+    7:  { type: 'p', text: 'Qual foi o momento mais engraçado que vivemos juntos?', cat: '😹' },
+    8:  { type: 'e', text: '⭐ ESPECIAL: Os dois têm que fazer um elogio super sincero um ao outro!', cat: '💖' },
+    9:  { type: 'd', text: 'Imite o outro fazendo algo do cotidiano! O parceiro tem que adivinhar!', cat: '😼' },
+    10: { type: 'p', text: 'Se você pudesse viajar a qualquer lugar comigo, onde seria?', cat: '✈️' },
+    11: { type: 'd', text: 'Faça uma foto fofa juntos agora e guarde pra recordação! 📸', cat: '😺' },
+    12: { type: 'p', text: 'Qual foi a primeira coisa que você pensou quando me viu pela primeira vez?', cat: '😻' },
+    13: { type: 'd', text: 'Diga 3 coisas que ama no outro, começando com letras do nome dele(a)!', cat: '💕' },
+    14: { type: 'p', text: 'Como você me descreveria em 3 palavras?', cat: '🐾' },
+    15: { type: 'e', text: '⭐ ESPECIAL: Escrevam juntos os planos para o próximo mês de namoro!', cat: '📝' },
+    16: { type: 'd', text: 'Dance por 1 minuto com a música favorita do outro! 🎵', cat: '😸' },
+    17: { type: 'p', text: 'Qual é o seu sonho para o nosso futuro juntos?', cat: '🌟' },
+    18: { type: 'd', text: 'Façam um jantar surpresa um para o outro (pode ser delivery!) 🍕', cat: '😺' },
+    19: { type: 'p', text: 'O que eu faço que te deixa com borboletas no estômago?', cat: '🦋' },
+    20: { type: 'e', text: '⭐ ESPECIAL: Quem é mais... (façam o Quiz Nós Dois juntos!)', cat: '🏆' },
+    21: { type: 'd', text: 'Conte ao outro um segredo que nunca contou antes! 🤫', cat: '😼' },
+    22: { type: 'p', text: 'Qual música te faz lembrar de mim quando escuta?', cat: '🎵' },
+    23: { type: 'd', text: 'Massagem nas mãos por 2 minutos cada um! 💆', cat: '😽' },
+    24: { type: 'p', text: 'O que você acha que ainda não sabe sobre mim?', cat: '🐱' },
+    25: { type: 'e', text: '⭐ JACKPOT FOFURA: Os dois escolhem um desafio especial da noite! 🌙', cat: '💫' },
+  };
+
+  const typeLabel = { p: 'Pergunta', d: 'Desafio', e: '✨ Especial' };
+  const typeClass = { p: 'pergunta', d: 'desafio', e: 'especial' };
+
+  const drawnNumbers = new Set();
+
+  // === GRID DE NÚMEROS ===
+  function buildGrid() {
+    const grid = document.getElementById('numbers-grid');
+    grid.innerHTML = '';
+    for (let i = 1; i <= 25; i++) {
+      const cell = document.createElement('div');
+      cell.className = 'num-cell' + (drawnNumbers.has(i) ? ' drawn' : '');
+      cell.textContent = i;
+      cell.id = `cell-${i}`;
+      cell.onclick = () => selectNumber(i);
+      grid.appendChild(cell);
+    }
+  }
+
+  buildGrid();
+
+  // === SORTEIO ===
+  function drawNumber() {
+    const available = [];
+    for (let i = 1; i <= 25; i++) {
+      if (!drawnNumbers.has(i)) available.push(i);
+    }
+    if (available.length === 0) {
+      alert('🎉 Todos os números foram sorteados! Reinicie para jogar de novo!');
+      return;
+    }
+
+    const spinner = document.getElementById('spinner');
+    const resultBox = document.getElementById('result-box');
+    const btn = document.getElementById('draw-btn');
+
+    resultBox.classList.remove('show');
+    spinner.classList.add('show');
+    btn.disabled = true;
+
+    let count = 0;
+    const interval = setInterval(() => {
+      count++;
+      if (count > 12) {
+        clearInterval(interval);
+        spinner.classList.remove('show');
+        btn.disabled = false;
+        const num = available[Math.floor(Math.random() * available.length)];
+        showResult(num);
+      }
+    }, 100);
+  }
+
+  function selectNumber(num) {
+    if (drawnNumbers.has(num)) return;
+    showResult(num);
+  }
+
+  function showResult(num) {
+    drawnNumbers.add(num);
+    buildGrid();
+
+    const card = cards[num];
+    document.getElementById('result-num').textContent = `Nº ${num}`;
+    document.getElementById('result-type').textContent = typeLabel[card.type];
+    document.getElementById('result-type').className = `result-type ${typeClass[card.type]}`;
+    document.getElementById('result-text').textContent = card.text;
+    document.getElementById('result-cat').textContent = card.cat;
+
+    const box = document.getElementById('result-box');
+    box.classList.add('show');
+
+    if (card.type === 'e') launchConfetti();
+  }
+
+  function resetGame() {
+    drawnNumbers.clear();
+    buildGrid();
+    document.getElementById('result-box').classList.remove('show');
+  }
+
+  // === CONFETTI ===
+  function launchConfetti() {
+    const wrap = document.getElementById('confetti-wrap');
+    const colors = ['#ff7eb3', '#e8365d', '#ffb6d9', '#ffd6e8', '#ff99c8', '#ffde59'];
+    for (let i = 0; i < 40; i++) {
+      const c = document.createElement('div');
+      c.className = 'confetti-piece';
+      c.style.left = Math.random() * 100 + 'vw';
+      c.style.top = '-10px';
+      c.style.background = colors[Math.floor(Math.random() * colors.length)];
+      c.style.width = (Math.random() * 8 + 6) + 'px';
+      c.style.height = (Math.random() * 8 + 6) + 'px';
+      c.style.animationDuration = (Math.random() * 1.5 + 1.5) + 's';
+      c.style.animationDelay = (Math.random() * 0.5) + 's';
+      wrap.appendChild(c);
+      setTimeout(() => c.remove(), 3500);
+    }
+  }
+
+  // === ABAS ===
+  function switchTab(name) {
+    document.querySelectorAll('.game-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    event.target.classList.add('active');
+  }
+
+  // === LISTAS ===
+  const perguntas = [
+    "Qual foi o momento em que você percebeu que estava se apaixonando por mim?",
+    "O que mais te agrada na minha personalidade?",
+    "Qual é a sua memória favorita nossa?",
+    "Como você me descreveria em 3 palavras?",
+    "Se pudermos viajar a qualquer lugar, onde você escolheria?",
+    "Qual música te faz lembrar de mim?",
+    "O que ainda não sabe sobre mim e quer saber?",
+    "Qual foi o momento mais engraçado que vivemos juntos?",
+    "O que eu faço que te deixa com borboletas no estômago?",
+    "Qual é o seu sonho para o nosso futuro?",
+    "Quais são seus valores mais importantes num relacionamento?",
+    "Qual é a sua memória favorita da infância?",
+    "Que tipo de aventura você gostaria de ter comigo?",
+    "O que você fala de mim para seus amigos?",
+    "Como você define nosso relacionamento em até 3 palavras?",
+  ];
+
+  const desafios = [
+    "Dê 5 beijos pelo rosto do outro sem parar! 💋",
+    "Olhem nos olhos um do outro por 30 segundos sem rir! 👀",
+    "Imite o outro fazendo algo do cotidiano — o parceiro adivinha!",
+    "Faça uma foto fofa juntos agora! 📸",
+    "Diga 3 coisas que ama no outro, com as letras do nome dele(a)!",
+    "Dance por 1 minuto com a música favorita do outro! 🎵",
+    "Massagem nas mãos por 2 minutos cada um! 💆",
+    "Conte um segredo que nunca contou antes! 🤫",
+    "Escrevam um bilhetinho fofo um para o outro agora!",
+    "Façam juntos uma lista de 5 coisas que querem fazer em casal!",
+    "Prepare uma surpresa mini para o outro (pode ser um abraço especial!)!",
+    "Troquem os celulares por 1 minuto e leiam as últimas msgs recebidas!",
+  ];
+
+  const quiz = [
+    "Quem é mais romântico(a)?",
+    "Quem se apaixonou primeiro?",
+    "Quem é mais ciumento(a)?",
+    "Quem é mais carinhoso(a)?",
+    "Quem come mais?",
+    "Quem cozinha melhor?",
+    "Quem demora mais para se arrumar?",
+    "Quem chora mais nos filmes?",
+    "Quem é mais preguiçoso(a)?",
+    "Quem é mais sonhador(a)?",
+    "Quem dorme mais?",
+    "Quem é mais esquecido(a)?",
+    "Quem é mais teimoso(a)?",
+    "Quem manda mais mensagens?",
+    "Quem é mais engraçado(a)?",
+    "Quem reclama mais?",
+    "Quem é mais competitivo(a)?",
+    "Quem é mais organizado(a)?",
+  ];
+
+  function buildList(listId, items, type) {
+    const el = document.getElementById(listId);
+    el.innerHTML = items.map((item, i) => `
+      <div class="q-item">
+        <div class="q-num ${type}">${i + 1}</div>
+        <div class="q-text">${item}</div>
+      </div>
+    `).join('');
+  }
+
+  buildList('perguntas-list', perguntas, 'p');
+  buildList('desafios-list', desafios, 'd');
+  buildList('quiz-list', quiz, 'e');
+</script>
+</body>
+</html>
